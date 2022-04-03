@@ -2,16 +2,14 @@ package com.farecalulator.service;
 
 import com.farecalulator.exception.ApplicationException;
 import com.farecalulator.model.Journey;
-import com.farecalulator.processors.PeakOffPeakFareRule;
 import com.farecalulator.validator.Validator;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FareController {
-  private static final Logger LOGGER = Logger.getLogger(PeakOffPeakFareRule.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(FareController.class.getName());
   FareCalculatorService fareCalculatorService = null;
   Validator<String> validator = null;
 
@@ -19,7 +17,7 @@ public class FareController {
     this.fareCalculatorService = fareCalculatorService;
   }
 
-  public void setValidator(Validator validator) {
+  public void setValidator(Validator<String> validator) {
     this.validator = validator;
   }
 

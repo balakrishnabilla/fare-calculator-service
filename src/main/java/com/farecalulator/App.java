@@ -20,8 +20,12 @@ import com.farecalulator.validator.DefaultValidator;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class App {
+
+  private static final Logger LOGGER = Logger.getLogger(App.class.getName());
+
   public static void main(String[] args) throws ApplicationException, IOException {
 
     PeakOffPeakFareCache peakOffPeakFareCache =
@@ -49,6 +53,7 @@ public class App {
 
     FareController fareController = new FareController(service);
     fareController.setValidator(new DefaultValidator());
-    System.out.println(fareController.getFare(input));
+    String fare = String.valueOf(fareController.getFare(input));
+    LOGGER.info(fare);
   }
 }

@@ -3,7 +3,11 @@ package com.farecalulator.processors;
 import com.farecalulator.dao.CacheManager;
 import com.farecalulator.dao.CacheType;
 import com.farecalulator.dao.cache.Cache;
-import com.farecalulator.dao.entity.*;
+import com.farecalulator.dao.entity.CappedFareData;
+import com.farecalulator.dao.entity.Path;
+import com.farecalulator.dao.entity.PeakOffPeakFareData;
+import com.farecalulator.dao.entity.PeakTimeData;
+import com.farecalulator.dao.entity.PeakTimeKey;
 import com.farecalulator.model.Journey;
 
 import java.time.DayOfWeek;
@@ -47,14 +51,14 @@ public class PeakOffPeakFareRule extends AbstractFareRuleProcessor {
   }
 
   private PeakOffPeakFareData getPeakOffPeakFareData(Path path) {
-    Cache cache = CacheManager.getInstance().get(CacheType.PEAK_OFF_PEAK_FARE);
-    PeakOffPeakFareData peakOffPeakCache = (PeakOffPeakFareData) cache.getData(path);
-    return peakOffPeakCache;
+    Cache<Path, PeakOffPeakFareData> cache =
+        CacheManager.getInstance().get(CacheType.PEAK_OFF_PEAK_FARE);
+    return cache.getData(path);
   }
 
   public boolean isPeakHour(DayOfWeek dayOfWeek, LocalTime time) {
-    Cache cache = CacheManager.getInstance().get(CacheType.PEAK_TIME);
-    PeakTimeData peakTimeData = (PeakTimeData) cache.getData(new PeakTimeKey(dayOfWeek));
+    Cache<PeakTimeKey, PeakTimeData> cache = CacheManager.getInstance().get(CacheType.PEAK_TIME);
+    PeakTimeData peakTimeData = cache.getData(new PeakTimeKey(dayOfWeek));
     return peakTimeData.getList().stream()
         .anyMatch(
             peakSchedule ->
@@ -68,10 +72,10 @@ public class PeakOffPeakFareRule extends AbstractFareRuleProcessor {
     if (farthestDailyPathMap.get(journey.getDate()) == null) {
       farthestDailyPathMap.put(journey.getDate(), currentPath);
     } else {
-      Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
-      double currentPathFare = ((CappedFareData) cache.getData(currentPath)).getDailyCap();
+      Cache<Path, CappedFareData> cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+      double currentPathFare = cache.getData(currentPath).getDailyCap();
       Path existingPath = farthestDailyPathMap.get(journey.getDate());
-      double existingPathFare = ((CappedFareData) cache.getData(existingPath)).getDailyCap();
+      double existingPathFare = cache.getData(existingPath).getDailyCap();
       if (currentPathFare > existingPathFare) {
         farthestDailyPathMap.put(journey.getDate(), currentPath);
       }

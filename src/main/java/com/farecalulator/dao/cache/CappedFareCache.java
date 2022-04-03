@@ -1,7 +1,6 @@
 package com.farecalulator.dao.cache;
 
 import com.farecalulator.dao.CacheType;
-import com.farecalulator.dao.cache.AbstractCache;
 import com.farecalulator.dao.entity.CappedFareData;
 import com.farecalulator.dao.entity.Path;
 import com.farecalulator.dao.loader.DataLoader;

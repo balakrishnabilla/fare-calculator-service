@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.Calendar;
 
 public class DateTimeUtil {
+  private DateTimeUtil() {}
+
   public static int getWeekNumber(LocalDate localDate) {
     Calendar calendar = Calendar.getInstance();
     calendar.setFirstDayOfWeek(Calendar.MONDAY);

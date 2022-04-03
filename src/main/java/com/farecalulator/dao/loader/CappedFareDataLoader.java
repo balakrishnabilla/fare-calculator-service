@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CappedFareDataLoader extends DataLoader<Path, CappedFareData> {
+public class CappedFareDataLoader implements DataLoader<Path, CappedFareData> {
 
   private Map<Path, CappedFareData> cappedFareDataMap = new HashMap<>();
 

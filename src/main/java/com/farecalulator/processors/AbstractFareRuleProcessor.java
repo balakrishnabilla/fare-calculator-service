@@ -7,7 +7,7 @@ import java.util.List;
 public abstract class AbstractFareRuleProcessor implements RuleProcessor {
   private RuleProcessor nextProcessor;
 
-  public AbstractFareRuleProcessor(RuleProcessor nextProcessor) {
+  protected AbstractFareRuleProcessor(RuleProcessor nextProcessor) {
     this.nextProcessor = nextProcessor;
   }
 

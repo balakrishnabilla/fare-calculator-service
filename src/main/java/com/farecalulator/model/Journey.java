@@ -3,6 +3,7 @@ package com.farecalulator.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class Journey implements Comparable<Journey> {
   private LocalDate date;
@@ -56,22 +57,41 @@ public class Journey implements Comparable<Journey> {
     this.fare = fare;
   }
 
-  public Journey clone() {
-    Journey journey = new Journey();
-    journey.setFare(this.getFare());
-    journey.setToZone(this.getToZone());
-    journey.setDate(this.getDate());
-    journey.setFromZone(this.getFromZone());
-    return journey;
+  public Journey(Journey journey) {
+    this.time = LocalTime.of(journey.getTime().getHour(), journey.getTime().getMinute());
+    this.date =
+        LocalDate.of(
+            journey.getDate().getYear(),
+            journey.getDate().getMonth(),
+            journey.getDate().getDayOfMonth());
+    this.fare = journey.getFare();
+    this.toZone = journey.getToZone();
+    this.fromZone = journey.getFromZone();
   }
 
   @Override
   public int compareTo(Journey journey) {
-    int date = this.getDate().compareTo(journey.getDate());
-    if (date == 0) {
+    int diff = this.getDate().compareTo(journey.getDate());
+    if (diff == 0) {
       return this.getTime().compareTo(journey.getTime());
     }
-    return date;
+    return diff;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Journey journey = (Journey) o;
+    return fromZone == journey.fromZone
+        && toZone == journey.toZone
+        && Objects.equals(date, journey.date)
+        && Objects.equals(time, journey.time);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(date, time, fromZone, toZone, fare);
   }
 
   @Override
@@ -96,7 +116,6 @@ public class Journey implements Comparable<Journey> {
     private String time;
     private int fromZone;
     private int toZone;
-    private double fare;
 
     public JourneyBuilder(String journey) {
       journey = journey.trim();
@@ -109,11 +128,10 @@ public class Journey implements Comparable<Journey> {
 
     public Journey build() {
       LocalDate localDate = LocalDate.parse(this.date, formatter);
-      String[] time = this.time.split(":");
-      LocalTime localTime = LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]));
-      Journey journey = new Journey(localDate, localTime, fromZone, toZone);
-      return journey;
+      String[] timePart = this.time.split(":");
+      LocalTime localTime =
+          LocalTime.of(Integer.parseInt(timePart[0]), Integer.parseInt(timePart[1]));
+      return new Journey(localDate, localTime, fromZone, toZone);
     }
-
   }
 }

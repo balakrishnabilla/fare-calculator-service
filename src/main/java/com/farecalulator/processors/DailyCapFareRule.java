@@ -63,15 +63,14 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
   }
 
   private double getDailyCapFare(Path farthestPath) {
-    Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
-    CappedFareData cappedFareData = (CappedFareData) cache.getData(farthestPath);
-    return cappedFareData.getDailyCap();
+    Cache<Path, CappedFareData> cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+    return cache.getData(farthestPath).getDailyCap();
   }
 
   private void populateDailyRollupMap(
       Map<LocalDate, Journey> dailyMap, Path farthestPath, Journey journey) {
     if (dailyMap.get(journey.getDate()) == null) {
-      dailyMap.put(journey.getDate(), journey.clone());
+      dailyMap.put(journey.getDate(), new Journey(journey));
     } else {
       Journey rollup = dailyMap.get(journey.getDate());
       rollup.setFromZone(farthestPath.getFromZone());
@@ -90,9 +89,9 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
 
       Path existingPath = farthestDailyPath.get(weekNumber);
 
-      Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
-      double currentPathFare = ((CappedFareData) cache.getData(currentPath)).getWeeklyCap();
-      double existingPathFare = ((CappedFareData) cache.getData(existingPath)).getWeeklyCap();
+      Cache<Path, CappedFareData> cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+      double currentPathFare = cache.getData(currentPath).getWeeklyCap();
+      double existingPathFare = cache.getData(existingPath).getWeeklyCap();
 
       if (currentPathFare > existingPathFare) {
         farthestDailyPath.put(weekNumber, currentPath);

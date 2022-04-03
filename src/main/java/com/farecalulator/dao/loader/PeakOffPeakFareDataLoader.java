@@ -6,7 +6,7 @@ import com.farecalulator.dao.entity.PeakOffPeakFareData;
 
 import java.util.*;
 
-public class PeakOffPeakFareDataLoader extends DataLoader<Path, PeakOffPeakFareData> {
+public class PeakOffPeakFareDataLoader implements DataLoader<Path, PeakOffPeakFareData> {
 
   private Map<Path, PeakOffPeakFareData> peakOffPeakFareDataMap = new HashMap<>();
 

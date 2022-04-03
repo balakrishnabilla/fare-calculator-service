@@ -9,7 +9,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.*;
 
-public class PeakTimeDataLoader extends DataLoader<PeakTimeKey, PeakTimeData> {
+public class PeakTimeDataLoader implements DataLoader<PeakTimeKey, PeakTimeData> {
   private Map<PeakTimeKey, PeakTimeData> peakTimeDataMap = new HashMap<>();
 
   public PeakTimeDataLoader() {
@@ -49,18 +49,15 @@ public class PeakTimeDataLoader extends DataLoader<PeakTimeKey, PeakTimeData> {
 
     peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.MONDAY), new PeakTimeData(weekDaySchedules));
     peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.TUESDAY), new PeakTimeData(weekDaySchedules));
-    peakTimeDataMap.put(
-        new PeakTimeKey(DayOfWeek.WEDNESDAY), new PeakTimeData(weekDaySchedules));
-    peakTimeDataMap.put(
-        new PeakTimeKey(DayOfWeek.THURSDAY), new PeakTimeData(weekDaySchedules));
+    peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.WEDNESDAY), new PeakTimeData(weekDaySchedules));
+    peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.THURSDAY), new PeakTimeData(weekDaySchedules));
     peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.FRIDAY), new PeakTimeData(weekDaySchedules));
 
     List<PeakSchedule> weekEndSchedules =
         Arrays.asList(
             new PeakSchedule(LocalTime.of(9, 0), LocalTime.of(11, 0)),
             new PeakSchedule(LocalTime.of(18, 0), LocalTime.of(22, 0)));
-    peakTimeDataMap.put(
-        new PeakTimeKey(DayOfWeek.SATURDAY), new PeakTimeData(weekEndSchedules));
+    peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.SATURDAY), new PeakTimeData(weekEndSchedules));
     peakTimeDataMap.put(new PeakTimeKey(DayOfWeek.SUNDAY), new PeakTimeData(weekEndSchedules));
   }
 }

@@ -2,7 +2,6 @@ package com.farecalulator.dao.cache;
 
 import com.farecalulator.dao.Data;
 import com.farecalulator.dao.DataKey;
-import com.farecalulator.dao.cache.Cache;
 import com.farecalulator.dao.loader.DataLoader;
 
 import java.util.Map;
@@ -11,7 +10,7 @@ public abstract class AbstractCache<K extends DataKey, V extends Data> implement
     private DataLoader<K,V> dataLoader;
     private Map<K, V> data;
 
-    public AbstractCache(DataLoader<K, V> dataLoader) {
+    protected AbstractCache(DataLoader<K, V> dataLoader) {
         this.dataLoader = dataLoader;
     }
 

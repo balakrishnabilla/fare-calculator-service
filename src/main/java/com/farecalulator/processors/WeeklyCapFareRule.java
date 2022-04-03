@@ -52,8 +52,8 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
   }
 
   private Double getWeeklyCapFare(Path farthestPath) {
-    Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
-    return ((CappedFareData) cache.getData(farthestPath)).getWeeklyCap();
+    Cache<Path, CappedFareData> cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+    return cache.getData(farthestPath).getWeeklyCap();
   }
 
   private void populateWeeklyRollupMap(
@@ -61,7 +61,7 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
     int weekNumber = DateTimeUtil.getWeekNumber(journey.getDate());
     Journey existingJourney = weeklyMap.get(weekNumber);
     if (existingJourney == null) {
-      weeklyMap.put(weekNumber, journey.clone());
+      weeklyMap.put(weekNumber, new Journey(journey));
     } else {
       Journey rollup = weeklyMap.get(weekNumber);
       rollup.setFromZone(farthestPath.getFromZone());

@@ -2,14 +2,14 @@ package com.farecalulator.dao;
 
 import com.farecalulator.dao.cache.Cache;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 
 public class CacheManager {
 
   private static final CacheManager INSTANCE = new CacheManager();
 
-  private Map<CacheType, Cache> caches = new HashMap<>();
+  private EnumMap<CacheType, Cache<? extends DataKey, ? extends Data>> caches =
+      new EnumMap<>(CacheType.class);
 
   private CacheManager() {}
 
@@ -17,7 +17,7 @@ public class CacheManager {
     return INSTANCE;
   }
 
-  public void registerCache(Cache cache) {
+  public void registerCache(Cache<? extends DataKey, ? extends Data> cache) {
     caches.put(cache.getType(), cache);
   }
 

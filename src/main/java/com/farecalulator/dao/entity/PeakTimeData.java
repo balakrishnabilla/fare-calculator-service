@@ -3,7 +3,6 @@ package com.farecalulator.dao.entity;
 import com.farecalulator.dao.Data;
 import com.farecalulator.model.PeakSchedule;
 
-import java.time.LocalTime;
 import java.util.List;
 
 public class PeakTimeData implements Data {
