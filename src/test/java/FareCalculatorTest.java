@@ -1,3 +1,10 @@
+import com.farecalulator.dao.*;
+import com.farecalulator.dao.cache.CappedFareCache;
+import com.farecalulator.dao.cache.PeakOffPeakFareCache;
+import com.farecalulator.dao.cache.PeakTimeCache;
+import com.farecalulator.dao.loader.CappedFareDataLoader;
+import com.farecalulator.dao.loader.PeakOffPeakFareDataLoader;
+import com.farecalulator.dao.loader.PeakTimeDataLoader;
 import com.farecalulator.exception.ApplicationException;
 import com.farecalulator.model.Journey;
 import com.farecalulator.processors.*;
@@ -5,6 +12,7 @@ import com.farecalulator.service.FareCalculatorService;
 import com.farecalulator.service.FareController;
 import com.farecalulator.utils.FileUtil;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -14,9 +22,25 @@ import java.util.List;
 
 public class FareCalculatorTest {
 
+  @Before
+  public void setup() {
+    CacheManager cacheManager = CacheManager.getInstance();
+    PeakOffPeakFareCache peakOffPeakFareCache =
+        new PeakOffPeakFareCache(new PeakOffPeakFareDataLoader());
+    peakOffPeakFareCache.createDataMap();
+    cacheManager.registerCache(peakOffPeakFareCache);
+
+    CappedFareCache cappedFareCache = new CappedFareCache(new CappedFareDataLoader());
+    cappedFareCache.createDataMap();
+    cacheManager.registerCache(cappedFareCache);
+
+    PeakTimeCache peakTimeCache = new PeakTimeCache(new PeakTimeDataLoader());
+    peakTimeCache.createDataMap();
+    cacheManager.registerCache(peakTimeCache);
+  }
+
   @Test
   public void testPeakOffPeakFareRule() {
-    // SUT
     RuleProcessor peakOffPeakFareRule = new PeakOffPeakFareRule(null);
     List<Journey> journeys = new ArrayList<>();
     addJourneyTestData(journeys);

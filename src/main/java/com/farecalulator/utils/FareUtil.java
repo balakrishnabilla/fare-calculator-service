@@ -1,6 +1,6 @@
 package com.farecalulator.utils;
 
-import com.farecalulator.model.Path;
+import com.farecalulator.dao.entity.Path;
 import com.farecalulator.model.PeakSchedule;
 
 import java.time.DayOfWeek;

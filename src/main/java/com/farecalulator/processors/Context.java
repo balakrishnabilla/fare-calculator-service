@@ -1,6 +1,6 @@
 package com.farecalulator.processors;
 
-import com.farecalulator.model.Path;
+import com.farecalulator.dao.entity.Path;
 
 import java.time.LocalDate;
 import java.util.HashMap;

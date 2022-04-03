@@ -43,7 +43,7 @@ public class DefaultValidator implements Validator<String> {
   private void validateAcceptedZone(String zoneStr, int zoneNUm, String s)
       throws ApplicationException {
     try {
-      Zone zone = Zone.of(zoneNUm);
+      Zone.of(zoneNUm);
     } catch (IllegalArgumentException exception) {
       throwAppException(s, zoneStr);
     }

@@ -11,8 +11,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FareController {
-  private static final Logger LOGGER =
-          Logger.getLogger(PeakOffPeakFareRule.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(PeakOffPeakFareRule.class.getName());
   FareCalculatorService fareCalculatorService = null;
   Validator<String> validator = null;
 
@@ -23,18 +22,6 @@ public class FareController {
   public void setValidator(Validator validator) {
     this.validator = validator;
   }
-  /*  public double getFare(List<Journey> journeyList)throws ApplicationException {
-  parse(journeyList);
-
-  */
-  /*    List<Journey> sortedJourneyList =
-  journeyList.stream().sorted(Comparator.comparing())
-      .collect(Collectors.toList());*/
-  /*
-    List<Journey> sortedJourneyList = null;
-
-    return fareCalculatorService.calculate(sortedJourneyList);
-  }*/
 
   public double getFare(List<String> journeyList) throws ApplicationException {
     validate(journeyList);
@@ -45,7 +32,7 @@ public class FareController {
 
   private void validate(List<String> journeyList) throws ApplicationException {
     if (this.validator == null) {
-      LOGGER.info("skipping validations");
+      LOGGER.info("validator is not setup, so hence alidations");
       return;
     }
     for (String journey : journeyList) {

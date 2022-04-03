@@ -1,7 +1,11 @@
 package com.farecalulator.processors;
 
+import com.farecalulator.dao.cache.Cache;
+import com.farecalulator.dao.CacheManager;
+import com.farecalulator.dao.CacheType;
+import com.farecalulator.dao.entity.CappedFareData;
 import com.farecalulator.model.Journey;
-import com.farecalulator.model.Path;
+import com.farecalulator.dao.entity.Path;
 import com.farecalulator.utils.FareUtil;
 
 import java.time.LocalDate;
@@ -34,30 +38,33 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
         totalFare = 0.0;
       }
       Path farthestPath = context.getDailyFarthestPath().get(journey.getDate());
-      double maxCapFare = FareUtil.getDailyCap(farthestPath);
-
+      double maxCapFare = getMaxCapFare(farthestPath);
       boolean isTotalFareExceedsCap = Double.sum(journey.getFare(), totalFare) >= maxCapFare;
       if (isTotalFareExceedsCap) {
         journey.setFare(maxCapFare - totalFare);
       }
       totalFare += journey.getFare();
-
       populateDailyRollupMap(dailyMap, farthestPath, journey);
       populateWeeklyFarthestMap(farthestWeeklyPath, journey);
     }
     context.setWeeklyFarthestPath(farthestWeeklyPath);
     List<Journey> dailyRollupList =
         dailyMap.values().stream().sorted().collect(Collectors.toList());
-    LOGGER.info("Daily Cap Fare Rule Applied");
-    LOGGER.info("==========================================");
+    LOGGER.info("===================Daily Cap Fare Rule Applied=======================");
     dailyRollupList.forEach(journey -> LOGGER.info(journey.toString()));
-    LOGGER.info("==========================================");
 
     if (hasNextChainAvailable()) {
       return super.process(dailyRollupList, context);
     } else {
       return dailyRollupList.stream().mapToDouble(Journey::getFare).sum();
     }
+  }
+
+  private double getMaxCapFare(Path farthestPath) {
+    Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+    CappedFareData cappedFareData = (CappedFareData) cache.getData(farthestPath);
+    double maxCapFare = cappedFareData.getDailyCap();
+    return maxCapFare;
   }
 
   private void populateDailyRollupMap(

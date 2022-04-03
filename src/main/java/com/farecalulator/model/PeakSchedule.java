@@ -7,13 +7,13 @@ public class PeakSchedule {
   private LocalTime startTime;
   private LocalTime endTime;
 
-  public LocalTime getStartTime() {
-    return startTime;
-  }
-
   public PeakSchedule(LocalTime startTime, LocalTime endTime) {
     this.startTime = startTime;
     this.endTime = endTime;
+  }
+
+  public LocalTime getStartTime() {
+    return startTime;
   }
 
   public LocalTime getEndTime() {

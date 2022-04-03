@@ -1,7 +1,7 @@
 package com.farecalulator.processors;
 
 import com.farecalulator.model.Journey;
-import com.farecalulator.model.Path;
+import com.farecalulator.dao.entity.Path;
 import com.farecalulator.utils.DateTimeUtil;
 import com.farecalulator.utils.FareUtil;
 
@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
-
   private static final Logger LOGGER = Logger.getLogger(WeeklyCapFareRule.class.getName());
 
   public WeeklyCapFareRule(RuleProcessor nextProcessor) {
@@ -38,13 +37,11 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
 
       Path farthestPath = context.getWeeklyFarthestPath().get(currentWeekNumber);
       Double maxCapFare = FareUtil.getWeeklyCap(farthestPath);
-
       boolean isTotalFareExceedsCap = (journey.getFare() + totalFare) >= maxCapFare;
       if (isTotalFareExceedsCap) {
         journey.setFare(maxCapFare - totalFare);
       }
       totalFare += journey.getFare();
-
       populateWeeklyRollupMap(weeklyMap, farthestPath, journey);
     }
     weeklyMap.values().forEach(journey -> LOGGER.info(journey.toString()));

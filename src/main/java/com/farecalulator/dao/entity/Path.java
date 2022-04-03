@@ -1,8 +1,10 @@
-package com.farecalulator.model;
+package com.farecalulator.dao.entity;
+
+import com.farecalulator.dao.DataKey;
 
 import java.util.Objects;
 
-public class Path {
+public class Path implements DataKey {
   private int fromZone;
   private int toZone;
 
