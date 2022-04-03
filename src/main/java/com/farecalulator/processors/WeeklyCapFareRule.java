@@ -1,9 +1,12 @@
 package com.farecalulator.processors;
 
-import com.farecalulator.model.Journey;
+import com.farecalulator.dao.CacheManager;
+import com.farecalulator.dao.CacheType;
+import com.farecalulator.dao.cache.Cache;
+import com.farecalulator.dao.entity.CappedFareData;
 import com.farecalulator.dao.entity.Path;
+import com.farecalulator.model.Journey;
 import com.farecalulator.utils.DateTimeUtil;
-import com.farecalulator.utils.FareUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +39,7 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
       }
 
       Path farthestPath = context.getWeeklyFarthestPath().get(currentWeekNumber);
-      Double maxCapFare = FareUtil.getWeeklyCap(farthestPath);
+      Double maxCapFare = getWeeklyCapFare(farthestPath);
       boolean isTotalFareExceedsCap = (journey.getFare() + totalFare) >= maxCapFare;
       if (isTotalFareExceedsCap) {
         journey.setFare(maxCapFare - totalFare);
@@ -46,6 +49,11 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
     }
     weeklyMap.values().forEach(journey -> LOGGER.info(journey.toString()));
     return weeklyMap.values().stream().map(Journey::getFare).reduce(0.0, Double::sum);
+  }
+
+  private Double getWeeklyCapFare(Path farthestPath) {
+    Cache cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
+    return ((CappedFareData) cache.getData(farthestPath)).getWeeklyCap();
   }
 
   private void populateWeeklyRollupMap(
