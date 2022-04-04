@@ -20,4 +20,7 @@ Important components
    are in place.
 4. Tried to apply the OOPS, SOLD principles and Design patters wherever applicable.    
 
-
+Project can be run as follows -
+1. Go to the folder where you have unzipped farecalculator
+3. sample Run below 
+java -jar fare-calculator-service-1.0-SNAPSHOT.jar "C:\fare-calculator-service\daily_journey.txt"
