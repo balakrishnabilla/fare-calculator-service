@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * This class is responsible for setting the Peak and Off peak fares for the collection of Journey
+ * And if there is DailyCapFareRule injected, then it will also calculate the farthest Path for each day will be required in
+ * DailyCapFareRule processing.
+ */
 public class PeakOffPeakFareRule extends AbstractFareRuleProcessor {
 
   private static final Logger LOGGER = Logger.getLogger(PeakOffPeakFareRule.class.getName());
@@ -42,12 +47,7 @@ public class PeakOffPeakFareRule extends AbstractFareRuleProcessor {
     }
     context.setDailyFarthestPath(farthestDailyPath);
     LOGGER.info("===================Peak OffPeak Fare Rule Applied=======================");
-
-    if (hasNextChainAvailable()) {
-      return super.process(journeyList, context);
-    } else {
-      return journeyList.stream().mapToDouble(Journey::getFare).sum();
-    }
+    return super.process(journeyList, context);
   }
 
   private PeakOffPeakFareData getPeakOffPeakFareData(Path path) {
@@ -68,6 +68,9 @@ public class PeakOffPeakFareRule extends AbstractFareRuleProcessor {
 
   private void populateDailyFarthestPathMap(
       Map<LocalDate, Path> farthestDailyPathMap, Journey journey) {
+    if (!hasNextChainAvailable()) {
+      return;
+    }
     Path currentPath = new Path(journey.getFromZone(), journey.getToZone());
     if (farthestDailyPathMap.get(journey.getDate()) == null) {
       farthestDailyPathMap.put(journey.getDate(), currentPath);

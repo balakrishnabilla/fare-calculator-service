@@ -15,7 +15,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
+/**
+ * This class is responsible for applying the daily cap fare rules and adjusting the fares of weekly
+ * Journeys And if there WeeklyCapFareRule injected, then it will also calculate the farthest Path
+ * for each day that will be required in WeeklyCapFareRule processing.
+ */
 public class DailyCapFareRule extends AbstractFareRuleProcessor {
   private static final Logger LOGGER = Logger.getLogger(DailyCapFareRule.class.getName());
 
@@ -39,14 +43,9 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
         previousDate = journey.getDate();
         totalFare = 0.0;
       }
-      Path farthestPath = context.getDailyFarthestPath().get(journey.getDate());
-      double maxCapFare = getDailyCapFare(farthestPath);
-      boolean isTotalFareExceedsCap = Double.sum(journey.getFare(), totalFare) >= maxCapFare;
-      if (isTotalFareExceedsCap) {
-        journey.setFare(maxCapFare - totalFare);
-      }
+      adjustFare(totalFare, journey, context);
       totalFare += journey.getFare();
-      populateDailyRollupMap(dailyMap, farthestPath, journey);
+      populateDailyRollupMap(dailyMap, context, journey);
       populateWeeklyFarthestMap(farthestWeeklyPath, journey);
     }
     context.setWeeklyFarthestPath(farthestWeeklyPath);
@@ -54,11 +53,15 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
         dailyMap.values().stream().sorted().collect(Collectors.toList());
     LOGGER.info("===================Daily Cap Fare Rule Applied=======================");
     dailyRollupList.forEach(journey -> LOGGER.info(journey.toString()));
+    return super.process(dailyRollupList, context);
+  }
 
-    if (hasNextChainAvailable()) {
-      return super.process(dailyRollupList, context);
-    } else {
-      return dailyRollupList.stream().mapToDouble(Journey::getFare).sum();
+  private void adjustFare(double totalFare, Journey journey, Context context) {
+    Path farthestPath = context.getDailyFarthestPath().get(journey.getDate());
+    double maxCapFare = getDailyCapFare(farthestPath);
+    boolean isTotalFareExceedsCap = Double.sum(journey.getFare(), totalFare) >= maxCapFare;
+    if (isTotalFareExceedsCap) {
+      journey.setFare(maxCapFare - totalFare);
     }
   }
 
@@ -68,31 +71,36 @@ public class DailyCapFareRule extends AbstractFareRuleProcessor {
   }
 
   private void populateDailyRollupMap(
-      Map<LocalDate, Journey> dailyMap, Path farthestPath, Journey journey) {
+      Map<LocalDate, Journey> dailyMap, Context context, Journey journey) {
+    Path farthestPath = context.getDailyFarthestPath().get(journey.getDate());
     if (dailyMap.get(journey.getDate()) == null) {
       dailyMap.put(journey.getDate(), new Journey(journey));
     } else {
-      Journey rollup = dailyMap.get(journey.getDate());
-      rollup.setFromZone(farthestPath.getFromZone());
-      rollup.setToZone(farthestPath.getToZone());
-      rollup.setFare(journey.getFare() + rollup.getFare());
+      rollup(dailyMap, journey, farthestPath);
     }
   }
 
+  private void rollup(Map<LocalDate, Journey> dailyMap, Journey journey, Path farthestPath) {
+    Journey rollup = dailyMap.get(journey.getDate());
+    rollup.setFromZone(farthestPath.getFromZone());
+    rollup.setToZone(farthestPath.getToZone());
+    rollup.setFare(journey.getFare() + rollup.getFare());
+  }
+
   private void populateWeeklyFarthestMap(Map<Integer, Path> farthestDailyPath, Journey journey) {
+    if (!hasNextChainAvailable()) {
+      return;
+    }
     Path currentPath = new Path(journey.getFromZone(), journey.getToZone());
     WeekFields weekFields = WeekFields.of(Locale.getDefault());
     int weekNumber = journey.getDate().get(weekFields.weekOfWeekBasedYear());
     if (farthestDailyPath.get(weekNumber) == null) {
       farthestDailyPath.put(weekNumber, currentPath);
     } else {
-
       Path existingPath = farthestDailyPath.get(weekNumber);
-
       Cache<Path, CappedFareData> cache = CacheManager.getInstance().get(CacheType.CAPPED_FARE);
       double currentPathFare = cache.getData(currentPath).getWeeklyCap();
       double existingPathFare = cache.getData(existingPath).getWeeklyCap();
-
       if (currentPathFare > existingPathFare) {
         farthestDailyPath.put(weekNumber, currentPath);
       }

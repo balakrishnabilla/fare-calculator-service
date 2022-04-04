@@ -8,11 +8,16 @@ import com.farecalulator.dao.entity.Path;
 import com.farecalulator.model.Journey;
 import com.farecalulator.utils.DateTimeUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
+/**
+ * This class is responsible for applying the weekly cap fare rules and adjusting the fares of
+ * weekly Journeys And if there MonthlyCapFareRule injected, then it will also calculate the
+ * farthest Path for each week that will be required in MonthlyCapFareRule processing.
+ */
 public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
   private static final Logger LOGGER = Logger.getLogger(WeeklyCapFareRule.class.getName());
 
@@ -37,18 +42,21 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
         prevWeekNumber = currentWeekNumber;
         totalFare = 0.0;
       }
-
       Path farthestPath = context.getWeeklyFarthestPath().get(currentWeekNumber);
-      Double maxCapFare = getWeeklyCapFare(farthestPath);
-      boolean isTotalFareExceedsCap = (journey.getFare() + totalFare) >= maxCapFare;
-      if (isTotalFareExceedsCap) {
-        journey.setFare(maxCapFare - totalFare);
-      }
+      adjustFare(totalFare, journey, farthestPath);
       totalFare += journey.getFare();
       populateWeeklyRollupMap(weeklyMap, farthestPath, journey);
     }
     weeklyMap.values().forEach(journey -> LOGGER.info(journey.toString()));
-    return weeklyMap.values().stream().map(Journey::getFare).reduce(0.0, Double::sum);
+    return super.process(new ArrayList<>(weeklyMap.values()), context);
+  }
+
+  private void adjustFare(double totalFare, Journey journey, Path farthestPath) {
+    Double maxCapFare = getWeeklyCapFare(farthestPath);
+    boolean isTotalFareExceedsCap = (journey.getFare() + totalFare) >= maxCapFare;
+    if (isTotalFareExceedsCap) {
+      journey.setFare(maxCapFare - totalFare);
+    }
   }
 
   private Double getWeeklyCapFare(Path farthestPath) {
@@ -63,10 +71,15 @@ public class WeeklyCapFareRule extends AbstractFareRuleProcessor {
     if (existingJourney == null) {
       weeklyMap.put(weekNumber, new Journey(journey));
     } else {
-      Journey rollup = weeklyMap.get(weekNumber);
-      rollup.setFromZone(farthestPath.getFromZone());
-      rollup.setToZone(farthestPath.getToZone());
-      rollup.setFare(journey.getFare() + rollup.getFare());
+      rollup(weeklyMap, farthestPath, journey, weekNumber);
     }
+  }
+
+  private void rollup(
+      Map<Integer, Journey> weeklyMap, Path farthestPath, Journey journey, int weekNumber) {
+    Journey rollup = weeklyMap.get(weekNumber);
+    rollup.setFromZone(farthestPath.getFromZone());
+    rollup.setToZone(farthestPath.getToZone());
+    rollup.setFare(journey.getFare() + rollup.getFare());
   }
 }

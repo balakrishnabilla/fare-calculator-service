@@ -4,6 +4,9 @@ import com.farecalulator.dao.cache.Cache;
 
 import java.util.EnumMap;
 
+/**
+ * Responsible for
+ */
 public class CacheManager {
 
   private static final CacheManager INSTANCE = new CacheManager();

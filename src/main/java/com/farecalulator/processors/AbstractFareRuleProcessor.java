@@ -16,7 +16,7 @@ public abstract class AbstractFareRuleProcessor implements RuleProcessor {
     if (nextProcessor != null) {
       return nextProcessor.process(journeyList, context);
     }
-    return 0.0;
+    return journeyList.stream().mapToDouble(Journey::getFare).sum();
   }
 
   protected boolean hasNextChainAvailable() {
