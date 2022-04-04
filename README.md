@@ -1,5 +1,4 @@
-"# fare-calculator-service" 
-# mvn clean install
+# fare-calculator-service
 Starting Point of the Application is App.java & some Junit test cases covering all functional requirements.
 Their job is to set/inject the dependencies before the start of the application and call the getFare methid of FareController
 Important components
@@ -21,7 +20,11 @@ Important components
    are in place.
 4. Tried to apply the OOPS, SOLD principles and Design patters wherever applicable.    
 
-Project can be run as follows -
-sample Run as follows with the text file as input.
-````
-java -jar fare-calculator-service-1.0-SNAPSHOT.jar "C:\fare-calculator-service\daily_journey.txt"
+###How to run -
+
+Run sample as follows with the text file as input.
+
+ ````
+    mvn clean install
+    
+    java -jar fare-calculator-service-1.0-SNAPSHOT.jar "C:\fare-calculator-service\daily_journey.txt"
