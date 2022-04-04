@@ -6,6 +6,7 @@ Important components
 
 1. Fare Rule Processing - 
     Fare Rule processing divided into 3 parts 
+   
     1. Apply Peak OR off-peak fare for each Journey and feed the farthest Daily path to Daily cap fare processor.
     2. Apply Daily Cap fare on each journey and rollup the daily model and farthest weekly path to Weekly cap fare processor.
     3. Similarly apply/adjust Weekly Cap fare on each DailyRollup Model and roll up the weekly model.
@@ -21,6 +22,6 @@ Important components
 4. Tried to apply the OOPS, SOLD principles and Design patters wherever applicable.    
 
 Project can be run as follows -
-1. Go to the folder where you have unzipped farecalculator
-3. sample Run below 
+sample Run as follows with the text file as input.
+````
 java -jar fare-calculator-service-1.0-SNAPSHOT.jar "C:\fare-calculator-service\daily_journey.txt"
