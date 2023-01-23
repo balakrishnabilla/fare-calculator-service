@@ -20,7 +20,7 @@ Important components
    are in place.
 4. Tried to apply the OOPS, SOLD principles and Design patters wherever applicable.    
 
-###How to run -
+### How to run -
 
 Run sample as follows with the text file as input.
 
